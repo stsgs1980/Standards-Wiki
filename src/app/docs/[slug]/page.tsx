@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import React from 'react';
 import {
   getDocBySlug,
+  getDocExtension,
   getNavigation,
   extractHeadings,
 } from '@/lib/mdx-utils';
@@ -12,6 +13,7 @@ import {
   getTabHref,
 } from '@/lib/nav-tabs';
 import MDXContent from '@/components/mdx/mdx-content';
+import MarkdownContent from '@/components/mdx/markdown-content';
 import DocsShell from './docs-shell';
 import { getVersion } from '@/lib/version';
 
@@ -73,9 +75,15 @@ export default async function DocPage({ params }: PageProps) {
       : undefined,
   };
 
-  // Pre-render MDX on the server — MDXRemote is an async Server Component
-  // and cannot be used inside a Client Component ('use client').
-  const renderedContent = <MDXContent source={doc.content} />;
+  // Pre-render content on the server. Render path depends on source format:
+  //   .mdx → MDX compiler (JSX allowed, bare `<tag>` is markup)
+  //   .md  → plain-markdown pipeline (bare `<tag>` is literal text, no JSX)
+  // Splitting prevents the "Expected a closing tag for `<html>`" MDX error on
+  // docs that use angle-bracket placeholders (e.g. A11Y, META, ARCH).
+  const ext = getDocExtension(slug);
+  const renderedContent = ext === '.mdx'
+    ? <MDXContent source={doc.content} />
+    : <MarkdownContent source={doc.content} />;
 
   const version = getVersion();
 

@@ -1,6 +1,7 @@
 import { visit } from 'unist-util-visit';
 import type { Plugin } from 'unified';
 import type { Root, Text, Element } from 'hast';
+import type { Root as MdxRoot, RootContent, Code, Html } from 'mdast';
 import { buildStatusRegex, statusBadgeClass } from '@/lib/statuses';
 
 /**
@@ -59,6 +60,32 @@ export function remarkFencedCodeDefaultLang() {
       if (!node.lang && !node.meta) {
         node.lang = 'plain';
       }
+    });
+  };
+}
+
+/**
+ * Remark plugin for the plain-markdown (`.md`) pipeline: turns raw `html`
+ * mdast nodes into `text` nodes so their angle brackets render as literal
+ * text instead of being treated as markup.
+ *
+ * Why this exists: plain Markdown documents use bare `<DOMAIN>`, `<NNN>`,
+ * `<html>` etc. as placeholders (a documentation convention). The MDX
+ * compiler would parse these as JSX tags and throw ("Expected a closing
+ * tag for `<html>`"); default remark-rehype would silently drop them
+ * (data loss). Neutralising to text keeps the placeholder visible verbatim
+ * and is the predictable, safe behaviour for `.md` content.
+ *
+ * Angle brackets inside inline code (`` `<html>` ``) and fenced code are
+ * already stored as plain text nodes by remark-parse, so they are untouched.
+ */
+export function remarkNeutralizeHtml() {
+  return (tree: MdxRoot) => {
+    visit(tree, 'html', (node: Html) => {
+      // Mutate the node in place: raw HTML becomes literal text. Cast because
+      // the mdast `html` literal type narrows `type` to 'html' — the reassign
+      // is intentional and the surrounding shape (value) is compatible.
+      (node as unknown as { type: 'text' }).type = 'text';
     });
   };
 }

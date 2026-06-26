@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@zai/select-element'],
   trailingSlash: true,
   reactStrictMode: true,
-  eslint: { ignoreDuringBuilds: true },
   
   // Allow cross-domain requests from sandbox proxy (Z.ai preview panel)
   allowedDevOrigins: ["*"],

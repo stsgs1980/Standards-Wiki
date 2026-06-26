@@ -33,7 +33,7 @@ export default function Header({
   tabHrefs,
 }: HeaderProps) {
   const activeTabStyle = 'px-3 py-1 text-[14px] font-medium text-foreground bg-muted rounded-full no-underline';
-  const inactiveTabStyle = 'px-3 py-1 text-[14px] font-medium text-muted-foreground hover:text-foreground bg-transparent rounded-full hover:bg-muted transition-colors no-underline';
+  const inactiveTabStyle = 'px-3 py-1 text-[14px] font-medium text-foreground/60 hover:text-foreground bg-muted/30 hover:bg-muted rounded-full transition-colors no-underline';
   return (
     <header className="sticky top-0 z-30 h-[49px] flex items-center border-b border-border bg-background">
       <div className="flex items-center w-full px-4">
@@ -86,7 +86,7 @@ export default function Header({
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1 ml-4">
+          <nav className="flex items-center gap-1 ml-4">
             {tabs.map((tab) => (
               <Link
                 key={tab.id}
