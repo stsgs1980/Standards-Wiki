@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  * Authorization: Bearer <API_KEY> header.
  * If API_KEY is not set, all requests pass (dev mode).
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const apiKey = process.env.API_KEY;
   if (!apiKey) return NextResponse.next();
 
